@@ -1,27 +1,33 @@
-
-# https://www.codewars.com/kata/symbolic-differentiation-of-prefix-expressions/train/python
+#!/bin/env python3
 
 import unittest
 
-### differentation rules, assume to differentiate for x
-### 
-### f(x) == (f x) => f'(x)
-### (cos x) => (- (sin x))
-### (sin x) => (cos x)
-### (* n x) => n
-### (* n (^ x m) => (* n (* m (^ x (- m 1))))
-### (* (f n) (g n)) => (+ (* (f' x) (g x)) (* (g' x) (f x)))
+"""
+Symbolic differentiation rules; assume to differentiate for variable x
+https://www.codewars.com/kata/symbolic-differentiation-of-prefix-expressions/train/python
+
+Examples:
+ - f(x) == (f x) => f'(x)
+ - (cos x) => (- (sin x))
+ - (sin x) => (cos x)
+ - (* n x) => n
+ - (* n (^ x m) => (* n (* m (^ x (- m 1))))
+ - (* (f n) (g n)) => (+ (* (f' x) (g x)) (* (g' x) (f x)))
+"""
+
 
 def product_rule(a, b):
-  return ['+', ['*', diff(a), b], ['*', a, diff(b)]]
+    return ['+', ['*', diff(a), b], ['*', a, diff(b)]]
+
 
 def diff(formula):
-  if isinstance(formula, int):
-    return 0
-  if formula == 'x': return 1
-  if formula[0] == "*":
-    return product_rule(formula[1], formula[2])
-  return formula
+    if isinstance(formula, int):
+        return 0
+    if formula == 'x': return 1
+    if formula[0] == "*":
+        return product_rule(formula[1], formula[2])
+    return formula
+
 
 def simplify(formula):
     if not isinstance(formula, list):
@@ -50,16 +56,17 @@ def simplify(formula):
     else:
         return formula
 
+
 def differentiate(s):
-  formula = simplify(parse(s))
-  return simplify(diff(formula))
+    formula = simplify(parse(s))
+    return simplify(diff(formula))
 
 
 def parse(text):
     text = text.replace('(', '( ').replace(')', ' )')
     tokens = text.split()
-    retval = []
     it = iter(tokens)
+
     def internal_parse(it):
         ret = []
         for tok in it:
@@ -74,14 +81,16 @@ def parse(text):
             else:
                 ret.append(tok)
         return ret
+
     return internal_parse(it)[0]
 
+
 def dump(text):
+    # print(text)
     return text
 
+
 class TestGoal(unittest.TestCase):
-    #def test_working(self):
-    #    self.assertEqual(1 + 1, 2)
 
     def test_to_datastructure(self):
         self.assertEqual(dump(parse("(* x 2)")), ['*', 'x', 2])
@@ -109,9 +118,8 @@ class TestGoal(unittest.TestCase):
         self.assertEqual(differentiate("(* 2 x)"), 2)
         self.assertEqual(dump(parse("(* x (* 2 x))")), ['*', 'x', ['*', 2, 'x']])
         self.assertEqual(differentiate("(* x (* 2 x))"), ['+', ['*', 2, 'x'], ['*', 'x', 2]])
-        
 
-    #def test_goal(self):
+    # def test_goal(self):
     #    self.assertEqual(differentiate("(^ x 2)"), "(* 2 x)")
 
 
@@ -119,3 +127,5 @@ class TestGoal(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
 
+    # unittest command for Jupyter notebooks:
+    # unittest.main(argv=['first-arg-is-ignored'], exit=False)
