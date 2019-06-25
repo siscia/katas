@@ -12,8 +12,21 @@ import unittest
 ### (* n (^ x m) => (* n (* m (^ x (- m 1))))
 ### (* (f n) (g n)) => (+ (* (f' x) (g x)) (* (g' x) (f x)))
 
+def product_rule(a, b):
+  return ['+', ['*', diff(a), b], ['*', a, diff(b)]]
+
+def diff(formula):
+  if isinstance(formula, int):
+    return 0
+  if formula == 'x': return 1
+  if formula[0] == "*":
+    return product_rule(formula[1], formula[2])
+  return formula
+
 def differentiate(s):
-    return s
+  formula = parse(s)
+  return diff(formula)
+
 
 #import re
 #tokens = ['(', ')', 'x', '*', '+', '-', '/', 'sin', 'cos', '^', 'ln', r'[0-9]+', r'\w+']
@@ -51,6 +64,16 @@ class TestGoal(unittest.TestCase):
         self.assertEqual(dump(parse("(* x 2)")), ['*', 'x', 2])
         self.assertEqual(dump(parse("(* x 12)")), ['*', 'x', 12])
         self.assertEqual(dump(parse("(+ (* x 12) (* x 2))")), ['+', ['*', 'x', 12], ['*', 'x', 2]])
+
+
+    def test_mult_diff(self):
+        self.assertEqual(dump(parse("(* x 2)")), ['*', 'x', 2])
+        self.assertEqual(differentiate("(* x 2)"), [2])
+        self.assertEqual(dump(parse("(* 2 x)")), ['*', 2, 'x'])
+        self.assertEqual(differentiate("(* 2 x)"), [2])
+        self.assertEqual(dump(parse("(* x (* 2 x))")), ['*', 'x', ['*', 2, 'x']])
+        self.assertEqual(differentiate("(* x (* 2 x))"), ['+', ['*', 2, 'x'], ['*', 'x', 2]])
+        
 
     #def test_goal(self):
     #    self.assertEqual(differentiate("(^ x 2)"), "(* 2 x)")
