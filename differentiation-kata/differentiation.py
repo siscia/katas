@@ -23,14 +23,37 @@ def diff(formula):
     return product_rule(formula[1], formula[2])
   return formula
 
+def simplify(formula):
+    if not isinstance(formula, list):
+        return formula
+    formula = [simplify(i) for i in formula]
+    if formula[0] == "*":
+        if formula[1] == 0 or formula[2] == 0:
+            return 0
+        elif formula[1] == 1:
+            return formula[2]
+        elif formula[2] == 1:
+            return formula[1]
+        elif isinstance(formula[1], int) and isinstance(formula[2], int):
+            return formula[1] * formula[2]
+        else:
+            return formula
+    elif formula[0] == "+":
+        if formula[1] == 0:
+            return formula[2]
+        elif formula[2] == 0:
+            return formula[1]
+        elif isinstance(formula[1], int) and isinstance(formula[2], int):
+            return formula[1] + formula[2]
+        else:
+            return formula
+    else:
+        return formula
+
 def differentiate(s):
-  formula = parse(s)
-  return diff(formula)
+  formula = simplify(parse(s))
+  return simplify(diff(formula))
 
-
-#import re
-#tokens = ['(', ')', 'x', '*', '+', '-', '/', 'sin', 'cos', '^', 'ln', r'[0-9]+', r'\w+']
-#tokens = [re.compile(i) for i in tokens]
 
 def parse(text):
     text = text.replace('(', '( ').replace(')', ' )')
@@ -65,12 +88,25 @@ class TestGoal(unittest.TestCase):
         self.assertEqual(dump(parse("(* x 12)")), ['*', 'x', 12])
         self.assertEqual(dump(parse("(+ (* x 12) (* x 2))")), ['+', ['*', 'x', 12], ['*', 'x', 2]])
 
+    def test_simplify(self):
+        self.assertEqual(simplify(['*', 0, 'x']), 0)
+        self.assertEqual(simplify(['*', 'x', 0]), 0)
+        self.assertEqual(simplify(['*', 'x', 1]), 'x')
+        self.assertEqual(simplify(['*', 1, 'x']), 'x')
+        self.assertEqual(simplify(['*', 1, 2]), 2)
+        self.assertEqual(simplify(['*', 2, 3]), 6)
+        self.assertEqual(simplify(3), 3)
+        self.assertEqual(simplify('x'), 'x')
+
+        self.assertEqual(simplify(['+', 0, 'x']), 'x')
+        self.assertEqual(simplify(['+', 'x', 0]), 'x')
+        self.assertEqual(simplify(['+', 3, 2]), 5)
 
     def test_mult_diff(self):
         self.assertEqual(dump(parse("(* x 2)")), ['*', 'x', 2])
-        self.assertEqual(differentiate("(* x 2)"), [2])
+        self.assertEqual(differentiate("(* x 2)"), 2)
         self.assertEqual(dump(parse("(* 2 x)")), ['*', 2, 'x'])
-        self.assertEqual(differentiate("(* 2 x)"), [2])
+        self.assertEqual(differentiate("(* 2 x)"), 2)
         self.assertEqual(dump(parse("(* x (* 2 x))")), ['*', 'x', ['*', 2, 'x']])
         self.assertEqual(differentiate("(* x (* 2 x))"), ['+', ['*', 2, 'x'], ['*', 'x', 2]])
         
