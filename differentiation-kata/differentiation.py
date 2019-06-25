@@ -27,7 +27,6 @@ def parse(text):
     def internal_parse(it):
         ret = []
         for tok in it:
-            print(tok)
             if tok == '(':
                 ret.append(internal_parse(it))
             elif tok == ')':
@@ -51,7 +50,7 @@ class TestGoal(unittest.TestCase):
     def test_to_datastructure(self):
         self.assertEqual(dump(parse("(* x 2)")), ['*', 'x', 2])
         self.assertEqual(dump(parse("(* x 12)")), ['*', 'x', 12])
-        self.assertEqual(dump(parse("(+ (* x 12) (* x 2))")), ['+' ['*', 'x', 12], ['*', 'x', 2]])
+        self.assertEqual(dump(parse("(+ (* x 12) (* x 2))")), ['+', ['*', 'x', 12], ['*', 'x', 2]])
 
     #def test_goal(self):
     #    self.assertEqual(differentiate("(^ x 2)"), "(* 2 x)")
