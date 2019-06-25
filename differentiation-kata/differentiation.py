@@ -15,9 +15,20 @@ import unittest
 def differentiate(s):
     return s
 
+def parse(text):
+    return [ int(x) if x.isdigit() else x for x in text[1:-1].split()]
+
+def dump(text):
+    return text
+
 class TestGoal(unittest.TestCase):
     def test_working(self):
         self.assertEqual(1 + 1, 2)
+
+    def test_to_datastructure(self):
+        self.assertEqual(dump(parse("(* x 2)")), ['*', 'x', 2])
+        self.assertEqual(dump(parse("(* x 12)")), ['*', 'x', 12])
+        self.assertEqual(dump(parse("(+ (* x 12) (* x 2))")), ['+' ['*', 'x', 12], ['*', 'x', 2]])
 
     def test_goal(self):
         self.assertEqual(differentiate("(^ x 2)"), "(* 2 x)")
