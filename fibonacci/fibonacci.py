@@ -2,6 +2,17 @@
 
 import unittest
 
+values = dict()
+values[0] = 0
+values[1] = 1
+
+
+
+def fib (x):
+	if x not in values:
+		for i in range(len(values), x+1):
+			values[i] = values[i-1] + values[i-2]
+	return values[x]
 
 def negfib(x: int) -> int:
     # negfib(x) = negfib(x + 2) - negfib(x + 1)
@@ -16,8 +27,38 @@ def negfib(x: int) -> int:
 
     return tempx_1
 
+def fib2 (x):
+	temp_2 = 0
+	temp_1 = 1
+	if x== 0:
+		return 0
+	elif x== 1:
+		return 1
+	else:
+		pass
+	for i in range(2, x+1):
+		tx = temp_2 + temp_1
+		temp_2 = temp_1
+		temp_1 = tx
+
+	return temp_1
+
 
 class TestGoal(unittest.TestCase):
+    def test_to_datastructure(self):
+        self.assertEqual(fib2(0),0)
+        self.assertEqual(fib2(1),1)
+        self.assertEqual(fib2(2),1)
+        self.assertEqual(fib2(3),2)
+        self.assertEqual(fib2(4),3)
+
+    def test_jumping(self):
+        self.assertEqual(fib2(3),2)
+        self.assertEqual(fib2(4),3)
+        self.assertEqual(fib2(6),8)
+        self.assertEqual(fib2(50),12586269025)
+        self.assertEqual(fib2(2000000),12586269025)
+        
 
     def test_negative_fibonacci(self):
         #self.assertEqual(negfib(2), 1)
